@@ -15,7 +15,7 @@ import java.util.*
 
 @MangaSourceParser("TEAMXNOVEL", "TeamXNovel", "ar")
 internal class TeamXNovel(context: MangaLoaderContext) :
-	PagedMangaParser(context, MangaParserSource.TEAMXNOVEL, 10) {
+	PagedMangaParser(context, MangaParserSource.TEAMXNOVEL, pageSize = 10) {
 
 	override val availableSortOrders: Set<SortOrder> = EnumSet.of(SortOrder.UPDATED, SortOrder.POPULARITY)
 
