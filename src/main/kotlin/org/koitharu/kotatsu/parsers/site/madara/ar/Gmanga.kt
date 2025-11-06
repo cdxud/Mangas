@@ -7,4 +7,7 @@ import org.koitharu.kotatsu.parsers.site.madara.MadaraParser
 
 @MangaSourceParser("GMANGA", "Gmanga", "ar")
 internal class Gmanga(context: MangaLoaderContext) :
-	MadaraParser(context, MangaParserSource.GMANGA, "gmanga.site")
+	MadaraParser(context, MangaParserSource.GMANGA, "gmanga.site") {
+        override val datePattern = "d MMMM، yyyy"
+	override val stylePage = ""
+    }
