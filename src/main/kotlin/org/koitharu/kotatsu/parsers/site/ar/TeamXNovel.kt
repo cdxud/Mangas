@@ -190,22 +190,27 @@ internal class TeamXNovel(context: MangaLoaderContext) :
 	private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", sourceLocale)
 
 	private fun parseChapters(root: Element): List<MangaChapter> {
-		return root.requireElementById("chapter-contact").select(".eplister ul li")
-			.map { li ->
-				val url = li.selectFirstOrThrow("a").attrAsRelativeUrl("href")
-				MangaChapter(
-					id = generateUid(url),
-					title = li.selectFirstOrThrow(".epl-title").text(),
-					number = url.substringAfterLast('/').toFloatOrNull() ?: 0f,
-					volume = 0,
-					url = url,
-					scanlator = null,
-					uploadDate = dateFormat.parseSafe(li.selectFirstOrThrow(".epl-date").text()),
-					branch = null,
-					source = source,
-				)
-			}
-	}
+    return root.select(".enhanced-chapters-grid .chapter-card").map { card ->
+        val link = card.selectFirstOrThrow("a.chapter-link")
+        val href = link.attrAsRelativeUrl("href")
+
+        val title = link.selectFirst(".chapter-title")?.text()?.ifBlank { null }
+        val numberText = link.selectFirst(".chapter-number")?.text()?.replace("[^0-9.]".toRegex(), "")
+        val dateText = link.selectFirst(".chapter-date")?.ownText()
+
+        MangaChapter(
+            id = generateUid(href),
+            title = title ?: "الفصل ${numberText ?: ""}",
+            number = numberText?.toFloatOrNull() ?: 0f,
+            volume = 0,
+            url = href,
+            scanlator = null,
+            uploadDate = dateFormat.parseSafe(dateText),
+            branch = null,
+            source = source,
+        )
+    }
+}
 
 	override suspend fun getPages(chapter: MangaChapter): List<MangaPage> {
     val fullUrl = chapter.url.toAbsoluteUrl(domain)
