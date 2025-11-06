@@ -208,20 +208,23 @@ internal class TeamXNovel(context: MangaLoaderContext) :
 	}
 
 	override suspend fun getPages(chapter: MangaChapter): List<MangaPage> {
-		val fullUrl = chapter.url.toAbsoluteUrl(domain)
-		val doc = webClient.httpGet(fullUrl).parseHtml()
-		return doc.select(".image_list img, .image_list canvas").map { img ->
-			val url = when {
-				img.hasAttr("src") -> img.requireSrc().toRelativeUrl(domain)
-				else -> img.attrAsRelativeUrl("data-src")
-			}
-			
-			MangaPage(
-				id = generateUid(url),
-				url = url,
-				preview = null,
-				source = source,
-			)
-		}
-	}
+    val fullUrl = chapter.url.toAbsoluteUrl(domain)
+    val doc = webClient.httpGet(fullUrl).parseHtml()
+    val imageElements = doc.select("img.manga-chapter-img, .reading-manga img")
+
+    return imageElements.map { img ->
+        val url = when {
+            img.hasAttr("src") -> img.requireSrc().toRelativeUrl(domain)
+            img.hasAttr("data-src") -> img.attrAsRelativeUrl("data-src")
+            else -> null
+        } ?: return@map null
+
+        MangaPage(
+            id = generateUid(url),
+            url = url,
+            preview = null,
+            source = source,
+        )
+    }.filterNotNull()
+}
 }
