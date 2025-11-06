@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-group = "org.koitharu"
+group = "com.github.cdxud"
 version = "1.0"
 
 tasks.test {
